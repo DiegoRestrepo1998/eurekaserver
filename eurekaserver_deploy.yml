@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-dep
+  labels:
+    app: micro-eurekaserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micro-eurekaserver
+  template:
+    metadata: 
+      labels:
+        app: micro-eurekaserver
+    spec: 
+      containers:
+        - name: micro-eurekaserver
+          image: dfrestrepo1998/microservicio_eurekaserver:1.0.0
+          ports:
+          - containerPort: 8070
+          env:
+          - name: SPRING_PROFILES_ACTIVE
+            valueFrom:
+              configMapKeyRef: 
+                name: micropro-configmap
+                key: profiles-active
+          - name: SPRING_CONFIG_IMPORT
+            valueFrom:
+              configMapKeyRef: 
+                name: micropro-configmap
+                key: config-import   
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: micro-eurekaserver-service
+spec:
+  selector:
+    app: micro-eurekaserver
+  ports:
+    - protocol: TCP
+      port: 8070
+      targetPort: 8070
